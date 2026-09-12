@@ -1,0 +1,7 @@
+{
+  "name": "CarbonBrake — Micro Eco-Actions",
+  "description": "Multi-language app providing 1-minute micro-habits to reduce carbon footprint and digital waste (RU | EN | PL).",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
+
