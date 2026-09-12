@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { CategoryId, CompletedActionLog, EcoAction, Language, UserStats } from './types';
+import { Theme, getStoredTheme, saveStoredTheme, applyThemeToDocument } from './utils/theme';
 import { translations, defaultActions } from './data/translations';
 import {
   getStoredHistory,
@@ -19,6 +20,7 @@ import { AlertCircle, Sparkles } from 'lucide-react';
 
 export default function App() {
   // State initialization
+  const [theme, setTheme] = useState<Theme>(getStoredTheme);
   const [currentLang, setCurrentLang] = useState<Language>(getStoredLanguage);
   const [selectedCategory, setSelectedCategory] = useState<CategoryId>('digital_trash');
   const [currentAction, setCurrentAction] = useState<EcoAction>(
@@ -32,6 +34,18 @@ export default function App() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const t = translations[currentLang];
+
+  // Initialize theme on document on mount
+  useEffect(() => {
+    applyThemeToDocument(theme);
+  }, [theme]);
+
+  // Toggle Theme
+  const handleToggleTheme = () => {
+    const nextTheme: Theme = theme === 'dark' ? 'light' : 'dark';
+    setTheme(nextTheme);
+    saveStoredTheme(nextTheme);
+  };
 
   // Save language changes
   const handleSelectLang = (lang: Language) => {
@@ -199,36 +213,38 @@ export default function App() {
   }, [currentLang, selectedCategory]);
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-100 flex flex-col font-['Plus_Jakarta_Sans',sans-serif]">
-      {/* Sticky Header with Multi-Language Switcher (RU | EN | PL) */}
+    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 flex flex-col font-['Plus_Jakarta_Sans',sans-serif] transition-colors duration-200">
+      {/* Sticky Header with Multi-Language Switcher (RU | EN | PL), Theme toggle & Sound */}
       <Header
         currentLang={currentLang}
         onSelectLang={handleSelectLang}
         soundEnabled={soundEnabled}
         onToggleSound={() => setSoundEnabled((prev) => !prev)}
+        theme={theme}
+        onToggleTheme={handleToggleTheme}
         totalCo2SavedGrams={stats.totalCo2SavedGrams}
         currentStreak={stats.currentStreak}
       />
 
       {/* Main App Container */}
-      <main className="flex-1 max-w-5xl w-full mx-auto px-4 py-6 sm:px-6 flex flex-col">
+      <main className="flex-1 max-w-5xl w-full mx-auto px-3.5 py-4 sm:px-6 sm:py-6 flex flex-col">
         {/* Error / Alert banner if any */}
         {errorMessage && (
-          <div className="mb-4 p-3 rounded-xl bg-amber-950/50 border border-amber-500/30 text-amber-200 text-xs flex items-center justify-between gap-2 animate-in fade-in">
+          <div className="mb-4 p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-800 dark:text-amber-200 text-xs flex items-center justify-between gap-2 animate-in fade-in">
             <div className="flex items-center gap-2">
-              <AlertCircle className="w-4 h-4 text-amber-400 shrink-0" />
+              <AlertCircle className="w-4 h-4 text-amber-500 shrink-0" />
               <span>{errorMessage}</span>
             </div>
             <button
               onClick={() => setErrorMessage(null)}
-              className="text-amber-400 hover:text-amber-300 font-bold px-1"
+              className="text-amber-600 dark:text-amber-400 hover:opacity-80 font-bold px-1 cursor-pointer"
             >
               ✕
             </button>
           </div>
         )}
 
-        {/* Category Selector Tabs */}
+        {/* Category Selector Tabs with Full Uncut Text */}
         <CategorySelector
           currentLang={currentLang}
           selectedCategory={selectedCategory}
@@ -270,13 +286,13 @@ export default function App() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-zinc-900 bg-zinc-950 py-6 px-4 text-center text-xs text-zinc-500">
+      <footer className="border-t border-zinc-200 dark:border-zinc-900 bg-white/50 dark:bg-zinc-950 py-5 px-4 text-center text-xs text-zinc-500 transition-colors">
         <div className="max-w-5xl mx-auto space-y-2">
-          <p className="flex items-center justify-center gap-1.5 text-zinc-400 font-medium">
-            <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
+          <p className="flex items-center justify-center gap-1.5 text-zinc-600 dark:text-zinc-400 font-medium">
+            <Sparkles className="w-3.5 h-3.5 text-emerald-500 dark:text-emerald-400" />
             <span>{t.footer.poweredBy}</span>
           </p>
-          <p className="text-[11px] text-zinc-600 max-w-xl mx-auto">
+          <p className="text-[11px] text-zinc-400 dark:text-zinc-600 max-w-xl mx-auto">
             {t.footer.microActionInfo}
           </p>
         </div>
