@@ -73,22 +73,22 @@ export const translations: Record<Language, TranslationDictionary> = {
     appTagline: "Микро-действие для снижения CO₂",
     categories: {
       digital_trash: {
-        name: "📧 Цифровой мусор",
+        name: "Цифровой мусор",
         icon: "Mail",
         shortDesc: "Спам, ненужные вкладки, дубликаты в облаке и кэш",
       },
       phantom_power: {
-        name: "🔌 Фантомная энергия",
+        name: "Фантомная энергия",
         icon: "Zap",
         shortDesc: "Спящий режим, блоки питания и фоновые приборы",
       },
       water_saver: {
-        name: "🚰 Экономия воды",
+        name: "Экономия воды",
         icon: "Droplets",
         shortDesc: "Умное водопотребление и сбережение тепла",
       },
       custom: {
-        name: "✨ Свой AI запрос",
+        name: "Свой AI запрос",
         icon: "Sparkles",
         shortDesc: "Персональное микро-действие от Gemini 3.7",
       },
@@ -161,22 +161,22 @@ export const translations: Record<Language, TranslationDictionary> = {
     appTagline: "Micro-Actions to Slash CO₂",
     categories: {
       digital_trash: {
-        name: "📧 Digital Trash",
+        name: "Digital Trash",
         icon: "Mail",
         shortDesc: "Spam newsletters, unused tabs, cloud clutter & cache",
       },
       phantom_power: {
-        name: "🔌 Phantom Power",
+        name: "Phantom Power",
         icon: "Zap",
         shortDesc: "Vampire draw, idle chargers & standby electronics",
       },
       water_saver: {
-        name: "🚰 Water Saver",
+        name: "Water Saver",
         icon: "Droplets",
         shortDesc: "Smart water habits and heating energy preservation",
       },
       custom: {
-        name: "✨ Custom AI Action",
+        name: "Custom AI Action",
         icon: "Sparkles",
         shortDesc: "Personalized 1-minute prompt powered by Gemini 3.7",
       },
@@ -249,22 +249,22 @@ export const translations: Record<Language, TranslationDictionary> = {
     appTagline: "Mikro-działania redukujące CO₂",
     categories: {
       digital_trash: {
-        name: "📧 Cyfrowe Śmieci",
+        name: "Cyfrowe Śmieci",
         icon: "Mail",
         shortDesc: "Spam, niepotrzebne karty, duplikaty w chmurze i pamięć cache",
       },
       phantom_power: {
-        name: "🔌 Energia Fantomowa",
+        name: "Energia Fantomowa",
         icon: "Zap",
         shortDesc: "Pobór w trybie czuwania, ładowarki i uśpiony sprzęt",
       },
       water_saver: {
-        name: "🚰 Oszczędzanie Wody",
+        name: "Oszczędzanie Wody",
         icon: "Droplets",
         shortDesc: "Inteligentne zużycie wody i ograniczenie strat ciepła",
       },
       custom: {
-        name: "✨ Własne AI",
+        name: "Własne AI",
         icon: "Sparkles",
         shortDesc: "Spersonalizowane mikro-zadanie od Gemini 3.7",
       },
