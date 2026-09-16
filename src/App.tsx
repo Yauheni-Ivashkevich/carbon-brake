@@ -1,3 +1,4 @@
+import { FALLBACK_ACTIONS } from './data/fallbackData';
 import { useState, useEffect, useCallback } from 'react';
 import { CategoryId, CompletedActionLog, EcoAction, Language, UserStats } from './types';
 import { Theme, getStoredTheme, saveStoredTheme, applyThemeToDocument } from './utils/theme';
@@ -75,11 +76,14 @@ export default function App() {
     }
   };
 
-  // Generate new action via Gemini API
+// Generate new action via Gemini API with LocalStorage Caching & Fallback
   const handleGenerateAiAction = useCallback(
     async (customPromptText?: string) => {
       setIsLoadingAi(true);
       setErrorMessage(null);
+
+      // Формируем уникальный ключ кэша для комбинации категории и языка
+      const cacheKey = `carbon_brake_cache_${selectedCategory}_${currentLang}`;
 
       try {
         const response = await fetch('/api/generate-action', {
@@ -101,6 +105,12 @@ export default function App() {
         const resData = await response.json();
         if (resData.success && resData.data) {
           const aiData = resData.data;
+
+          // Сохраняем свежий успешный ответ от Gemini в кэш браузера
+          if (!customPromptText) {
+            localStorage.setItem(cacheKey, JSON.stringify(aiData));
+          }
+
           const newAction: EcoAction = {
             id: `ai_${Date.now()}`,
             title: aiData.title || t.categories[selectedCategory].name,
@@ -125,19 +135,49 @@ export default function App() {
           throw new Error(resData.error || 'Failed to parse AI action');
         }
       } catch (err: any) {
-        console.warn('AI generation error, using curated fallback:', err);
-        // Fallback to default curated action for category
-        const fallback = defaultActions[currentLang][selectedCategory] || defaultActions[currentLang].digital_trash;
-        setCurrentAction({
-          ...fallback,
+        console.warn('AI generation error, checking cache or using fallback:', err);
+
+        let fallbackData: any = null;
+
+        // 1. Пытаемся достать ранее закэшированный ответ для этой категории из localStorage
+        const cachedStr = localStorage.getItem(cacheKey);
+        if (cachedStr) {
+          try {
+            fallbackData = JSON.parse(cachedStr);
+          } catch (e) {
+            console.error('Error parsing cache', e);
+          }
+        }
+
+        // 2. Если кэша нет, берём статический ответ из src/data/fallbackData.ts
+        if (!fallbackData) {
+          const catKey = FALLBACK_ACTIONS[selectedCategory] ? selectedCategory : 'digital_trash';
+          fallbackData = FALLBACK_ACTIONS[catKey]?.[currentLang] || FALLBACK_ACTIONS.digital_trash.ru;
+        }
+
+        const fallbackAction: EcoAction = {
           id: `fb_${Date.now()}`,
-        });
+          title: fallbackData.title || t.categories[selectedCategory]?.name || 'Eco Action',
+          category: selectedCategory,
+          action: fallbackData.action,
+          impactFact: fallbackData.impactFact,
+          co2SavedGrams: Number(fallbackData.co2SavedGrams) || 15,
+          energySavedWh: Number(fallbackData.energySavedWh) || 10,
+          waterSavedLiters: Number(fallbackData.waterSavedLiters) || 0,
+          durationSeconds: Number(fallbackData.durationSeconds) || 60,
+          emoji: fallbackData.emoji || '🌿',
+          actionSteps: fallbackData.actionSteps || [fallbackData.action],
+          isAiGenerated: false,
+        };
+
+        setCurrentAction(fallbackAction);
+
         setErrorMessage(
           currentLang === 'ru'
-            ? 'Использовано базовое действие (Gemini API ответит при следующем запросе).'
+            ? 'Офлайн-режим: загружено сохраненное действие из кэша.'
             : currentLang === 'pl'
-            ? 'Użyto podstawowego zadania ekologicznego.'
-            : 'Loaded curated action from local library.'
+            ? 'Tryb offline: wczytano zadanie z pamięci podręcznej.'
+            : 'Offline mode: loaded cached action.'
         );
         setTimeout(() => setErrorMessage(null), 5000);
       } finally {
